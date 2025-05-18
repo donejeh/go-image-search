@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  go-app:
+    build:
+      context: .
+    container_name: go-app
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./static/uploads:/app/static/uploads
+    depends_on:
+      - embedder
+
+  embedder:
+    build:
+      context: ./python-embedder
+    container_name: embedder
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./static/uploads:/app/static/uploads
