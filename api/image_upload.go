@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/donejeh/go-image-search/embedding"
 	"github.com/google/uuid"
 )
 
@@ -29,7 +30,9 @@ func UploadImageHandler(w http.ResponseWriter, r *http.Request) {
 	// Generate a unique filename
 	ext := filepath.Ext(header.Filename)
 	filename := uuid.New().String() + ext
-	dst, err := os.Create(filepath.Join(UploadDir, filename))
+	fullPath := filepath.Join(UploadDir, filename)
+
+	dst, err := os.Create(fullPath)
 	if err != nil {
 		http.Error(w, "Could not save file", http.StatusInternalServerError)
 		return
@@ -43,7 +46,16 @@ func UploadImageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Generate embedding by calling Python service
+	embeddingVector, err := embedding.GetImageEmbedding(fullPath)
+	if err != nil {
+		http.Error(w, "Failed to get embedding", http.StatusInternalServerError)
+		return
+	}
+
+	// TODO: Save embedding to Elasticsearch in the next step
+
 	// Respond with success
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, `{"message":"Upload successful", "filename":"%s"}`, filename)
+	fmt.Fprintf(w, `{"message":"Upload successful", "filename":"%s", "embedding": %v}`, filename, embeddingVector)
 }
