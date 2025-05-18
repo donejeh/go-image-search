@@ -1,5 +1,11 @@
 flask
-torch
-torchvision
-transformers
+ftfy
+opencv-python-headless
 Pillow
+regex
+torch
+torchaudio
+torchvision
+tqdm
+transformers
+git+https://github.com/openai/CLIP.git
